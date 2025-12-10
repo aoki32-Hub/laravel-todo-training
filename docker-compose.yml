@@ -1,0 +1,99 @@
+# 新人研修向けLaravel ToDoアプリ開発環境
+# Docker Compose設定ファイル
+
+version: '3.8'
+
+services:
+  # PHP-FPMコンテナ
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: laravel-todo-php
+    working_dir: /var/www/html
+    volumes:
+      # ソースコードをマウント（ホストの変更がコンテナに反映）
+      - ./src:/var/www/html
+      # ログディレクトリ
+      - ./storage/logs:/var/log/php
+    environment:
+      # MySQL接続設定
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: laravel_todo
+      DB_USERNAME: laravel_user
+      DB_PASSWORD: laravel_password
+    depends_on:
+      - mysql
+    networks:
+      - laravel-network
+    restart: unless-stopped
+
+  # Nginxコンテナ
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: laravel-todo-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      # ソースコードをマウント
+      - ./src:/var/www/html
+      # ログディレクトリ
+      - ./storage/logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+    networks:
+      - laravel-network
+    restart: unless-stopped
+
+  # MySQLコンテナ
+  mysql:
+    image: mysql:8.0
+    container_name: laravel-todo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: laravel_todo
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: laravel_password
+      TZ: Asia/Tokyo
+    ports:
+      - "3306:3306"
+    volumes:
+      # MySQL設定ファイル
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      # データベースデータの永続化
+      - mysql-data:/var/lib/mysql
+      # ログディレクトリ
+      - ./storage/logs/mysql:/var/log/mysql
+    networks:
+      - laravel-network
+    restart: unless-stopped
+
+  # phpMyAdmin（オプション：データベース管理ツール）
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: laravel-todo-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: laravel_user
+      PMA_PASSWORD: laravel_password
+      PMA_ROOT_PASSWORD: root_password
+    ports:
+      - "8001:80"
+    depends_on:
+      - mysql
+    networks:
+      - laravel-network
+    restart: unless-stopped
+
+# ネットワーク定義
+networks:
+  laravel-network:
+    driver: bridge
+
+# ボリューム定義
+volumes:
+  mysql-data:
+    driver: local

@@ -1,0 +1,57 @@
+# Laravel固有のファイル
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/bootstrap/cache
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+.rnd
+
+# IDE・エディタ設定
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Composer
+vendor/
+composer.lock
+
+# Node.js（フロントエンドビルドツール使用時）
+npm-debug.log
+yarn-error.log
+
+# OS固有のファイル
+Thumbs.db
+.DS_Store
+
+# ログファイル
+storage/logs/
+
+# キャッシュ
+storage/framework/cache/
+storage/framework/views/
+
+# テンポラリファイル
+*.tmp
+*.temp
+
+# Docker関連（ローカル開発環境のみ）
+# 本番環境ではコンテナ内のデータを保持する場合がある
+storage/logs/mysql/
+storage/logs/nginx/
+storage/logs/php/
+
+# 開発環境のみのファイル
+.env.local
+.env.*.local
